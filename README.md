@@ -1,2 +1,2 @@
-# CMPT120
+# Dear Diary
 Intro to programming at Marist College
