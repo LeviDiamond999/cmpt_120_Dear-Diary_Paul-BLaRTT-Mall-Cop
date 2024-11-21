@@ -47,6 +47,7 @@ def login():
         return False
 
 # Sign-up function
+'''
 def signup():
     """Sign-up page for new users."""
     print("=== Sign-Up Page ===")
@@ -58,6 +59,7 @@ def signup():
         return False
     is_admin = input("Is this an admin account? (yes/no): ").strip().lower() == "yes"
     return add_user(username, password, is_admin)
+    '''
 
 # Example usage
 if __name__ == "__main__":
@@ -65,14 +67,16 @@ if __name__ == "__main__":
     while True:
         print("\nOptions:")
         print("1. Login")
+        '''
         print("2. Sign Up")
-        print("3. Exit")
-        choice = input("Select an option (1/2/3): ")
+        '''
+        print("2. Exit")
+        choice = input("Select an option (1 or 2): ")
         if choice == '1':
             login()
-        elif choice == '2':
-            signup()
         elif choice == '3':
+            signup()
+        elif choice == '2':
             print("Goodbye!")
             break
         else:
