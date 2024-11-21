@@ -5,6 +5,9 @@ from hashlib import sha256
 db = TinyDB('users.json')
 users_table = db.table('users')
 User = Query()
+if db.search(User.username == 'Admin') == False:
+    users_table.insert({"username": Admin, "password": hash_password("Admin"), "is_admin": True})
+    
 
 # Utility functions
 def hash_password(password):
