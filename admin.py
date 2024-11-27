@@ -1,94 +1,73 @@
-import os
-import time
+from tinydb import TinyDB, Query
 
-def print_main_menu():
-    os.system('cls' if os.name == 'nt' else 'clear')
-    print("============================")
-    print("      Admin Main Menu       ")
-    print("============================")
-    print("1. Insert Data")
-    print("2. Delete Data")
-    print("3. Edit Data")
-    print("4. Search Data")
-    print("5. View All Data")
-    print("6. Exit")
+def display_menu():
+    print("\nAdmin Main Menu")
+    print("1. View all diary entries")
+    print("2. Add a new diary entry")
+    print("3. Edit an existing diary entry")
+    print("4. Delete a diary entry")
+    print("5. Exit")
 
-def insert_data(data_store):
-    print("\n--- Insert Data ---")
-    entry = input("Enter new data: ")
-    data_store.append(entry)
-    print("Insertion successful!")
-    time.sleep(1)
-
-def delete_data(data_store):
-    print("\n--- Delete Data ---")
-    for idx, entry in enumerate(data_store):
-        print(f"{idx + 1}. {entry}")
-    choice = int(input("Select the number of the data to delete: ")) - 1
-    if 0 <= choice < len(data_store):
-        removed = data_store.pop(choice)
-        print(f"Deleted: {removed}")
+def view_entries(db):
+    entries = db.all()
+    if entries:
+        print("\nDiary Entries:")
+        for entry in entries:
+            print(f"ID: {entry.doc_id}, Date: {entry['date']}, Content: {entry['content']}")
     else:
-        print("Invalid choice!")
-    time.sleep(1)
+        print("\nNo entries found.")
 
-def edit_data(data_store):
-    print("\n--- Edit Data ---")
-    for idx, entry in enumerate(data_store):
-        print(f"{idx + 1}. {entry}")
-    choice = int(input("Select the number of the data to edit: ")) - 1
-    if 0 <= choice < len(data_store):
-        new_entry = input("Enter new data: ")
-        data_store[choice] = new_entry
-        print("Edit successful!")
-    else:
-        print("Invalid choice!")
-    time.sleep(1)
+def add_entry(db):
+    date = input("Enter the date (YYYY-MM-DD): ")
+    content = input("Enter the diary content: ")
+    db.insert({"date": date, "content": content})
+    print("Entry added successfully!")
 
-def search_data(data_store):
-    print("\n--- Search Data ---")
-    query = input("Enter search term: ")
-    results = [entry for entry in data_store if query.lower() in entry.lower()]
-    if results:
-        print("Search results:")
-        for result in results:
-            print(result)
-    else:
-        print("No matches found!")
-    input("Press Enter to return to the menu.")
+def edit_entry(db):
+    try:
+        entry_id = int(input("Enter the ID of the entry to edit: "))
+        entry = db.get(doc_id=entry_id)
+        if entry:
+            print(f"Current Date: {entry['date']}, Current Content: {entry['content']}")
+            date = input("Enter new date (leave blank to keep current): ") or entry['date']
+            content = input("Enter new content (leave blank to keep current): ") or entry['content']
+            db.update({"date": date, "content": content}, doc_ids=[entry_id])
+            print("Entry updated successfully!")
+        else:
+            print("Entry not found.")
+    except ValueError:
+        print("Invalid ID format. Please enter a number.")
 
-def view_all_data(data_store):
-    print("\n--- All Stored Data ---")
-    if data_store:
-        for idx, entry in enumerate(data_store):
-            print(f"{idx + 1}. {entry}")
-    else:
-        print("No data available.")
-    input("Press Enter to return to the menu.")
+def delete_entry(db):
+    try:
+        entry_id = int(input("Enter the ID of the entry to delete: "))
+        if db.remove(doc_ids=[entry_id]):
+            print("Entry deleted successfully!")
+        else:
+            print("Entry not found.")
+    except ValueError:
+        print("Invalid ID format. Please enter a number.")
 
 def main():
-    data_store = []
+    db = TinyDB('diary.json')
 
     while True:
-        print_main_menu()
+        display_menu()
         choice = input("\nEnter your choice: ")
 
         if choice == "1":
-            insert_data(data_store)
+            view_entries(db)
         elif choice == "2":
-            delete_data(data_store)
+            add_entry(db)
         elif choice == "3":
-            edit_data(data_store)
+            edit_entry(db)
         elif choice == "4":
-            search_data(data_store)
+            delete_entry(db)
         elif choice == "5":
-            view_all_data(data_store)
-        elif choice == "6":
-            print("Exiting... Goodbye!")
+            print("Exiting the program. Goodbye!")
             break
         else:
-            print("Invalid choice! Please try again.")
-            time.sleep(1)
+            print("Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     main()
