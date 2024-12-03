@@ -120,7 +120,7 @@ def main_menu(username):
             search_diary_entries(username)
         elif choice == '6':
             print("Logging out. Goodbye!")
-            ProjectLogin.login()
+            loginpage.login()
         else:
             print("Invalid choice. Please try again.")
             
