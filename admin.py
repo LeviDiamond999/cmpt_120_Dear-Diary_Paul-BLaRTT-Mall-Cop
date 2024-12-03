@@ -1,73 +1,115 @@
 from tinydb import TinyDB, Query
+import datetime
+import ProjectLogin
 
-def display_menu():
-    print("\nAdmin Main Menu")
-    print("1. View all diary entries")
-    print("2. Add a new diary entry")
-    print("3. Edit an existing diary entry")
-    print("4. Delete a diary entry")
-    print("5. Exit")
 
-def view_entries(db):
-    entries = db.all()
-    if entries:
-        print("\nDiary Entries:")
-        for entry in entries:
-            print(f"ID: {entry.doc_id}, Date: {entry['date']}, Content: {entry['content']}")
+# Initialize TinyDB dairy entries
+db = TinyDB('diary.json')
+diary_table = db.table('diaries')
+Diary = Query()
+# Initialize database
+database = TinyDB('database.json')
+users_table = database.table('users')  # Table for user credentials
+User = Query()
+today=datetime.date.today()
+
+def add_user():
+    name = input("Enter the username: ")
+    passwrd = input("Enter the password: ")
+
+    if not users_table.search(User.username == name):
+        users_table.insert({'username': name, 'password': passwrd, 'is_admin': False})
+        print(f"Account created with username: {name} and password: {passwrd}")
+    
+# Functions for diary management
+def add_diary_entry(username):
+    """Add a new diary entry."""
+    print("\n=== Add Diary Entry ===")
+    '''
+    time = input("Enter the date (MM-DD-YYYY): ")
+    '''
+    now=datetime.datetime.now()
+    current_time=now.strftime("%H:%M")
+    print(f"Current date and time: {today} {current_time}")
+    title = input("Enter a title: ")
+    entry = input("Journal Entry: ")
+    
+    
+    diary_table.insert({
+        "username": username,
+        "time": current_time,
+        "title": title,
+        "entry": entry,
+        
+    })
+    print("Diary entry added successfully!")
+
+def view_diary_entries():
+    """View all diary entries for the current user."""
+    print("\n=== View Diary Entries ===")
+    entries = diary_table
+    if not entries:
+        print("No diary entries found.")
+        return
+    for i, entry in enumerate(entries, start=1):
+        print(f"\nEntry {i}:")
+
+        print(f"User: {entry['username']}")
+        print(f"Time: {entry['time']}")
+        
+        print(f"Title: {entry['title']}")
+        print(f"Entry: {entry['entry']}")
+        
+
+def delete_diary_entry():
+    """Delete a diary entry."""
+    print("\n=== Delete Diary Entry ===")
+    view_diary_entries()
+    title = input("\nEnter the title of the entry to delete: ")
+    if diary_table.remove(Diary.title == title):
+        print("Diary entry deleted successfully!")
     else:
-        print("\nNo entries found.")
+        print("No entry found with the given title.")
 
-def add_entry(db):
-    date = input("Enter the date (YYYY-MM-DD): ")
-    content = input("Enter the diary content: ")
-    db.insert({"date": date, "content": content})
-    print("Entry added successfully!")
+def search_diary_entries():
+    """Search diary entries."""
+    print("\n=== Search Diary Entries ===")
+    criteria = input("Search by (time/title): ").strip().lower()
+    value = input(f"Enter the {criteria}: ").strip()
+    entries = diary_table.search(Diary[criteria] == value)
+    if not entries:
+        print("No diary entries found.")
+        return
+    for i, entry in enumerate(entries, start=1):
+        print(f"\nEntry {i}:")
+        print(f"Time: {entry['time']}")
+        print(f"Title: {entry['title']}")
 
-def edit_entry(db):
-    try:
-        entry_id = int(input("Enter the ID of the entry to edit: "))
-        entry = db.get(doc_id=entry_id)
-        if entry:
-            print(f"Current Date: {entry['date']}, Current Content: {entry['content']}")
-            date = input("Enter new date (leave blank to keep current): ") or entry['date']
-            content = input("Enter new content (leave blank to keep current): ") or entry['content']
-            db.update({"date": date, "content": content}, doc_ids=[entry_id])
-            print("Entry updated successfully!")
-        else:
-            print("Entry not found.")
-    except ValueError:
-        print("Invalid ID format. Please enter a number.")
-
-def delete_entry(db):
-    try:
-        entry_id = int(input("Enter the ID of the entry to delete: "))
-        if db.remove(doc_ids=[entry_id]):
-            print("Entry deleted successfully!")
-        else:
-            print("Entry not found.")
-    except ValueError:
-        print("Invalid ID format. Please enter a number.")
-
-def main():
-    db = TinyDB('diary.json')
-
+# Main Menu
+def main_menu():
+    """Main menu for the diary system."""
     while True:
-        display_menu()
-        choice = input("\nEnter your choice: ")
-
-        if choice == "1":
-            view_entries(db)
-        elif choice == "2":
-            add_entry(db)
-        elif choice == "3":
-            edit_entry(db)
-        elif choice == "4":
-            delete_entry(db)
-        elif choice == "5":
-            print("Exiting the program. Goodbye!")
-            break
+        print("\n=== Main Menu ===")
+        print("1. View Diary Entries")
+        print("2. Delete Diary Entry")
+        print("3. Search Diary Entries")
+        print("4. Add User")
+        print("5. Logout")
+        choice = input("Select an option (1-5): ")
+        if choice == '1':
+            view_diary_entries()
+        elif choice == '2':
+            delete_diary_entry()
+        elif choice == '3':
+            search_diary_entries()
+        elif choice == '4':
+            add_user()
+        elif choice == '5':
+            print("Logging out. Goodbye!")
+            ProjectLogin.login()
         else:
             print("Invalid choice. Please try again.")
-
-if __name__ == "__main__":
-    main()
+            
+def main():
+    
+    main_menu()
