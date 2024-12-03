@@ -106,7 +106,7 @@ def main_menu():
             add_user()
         elif choice == '5':
             print("Logging out. Goodbye!")
-            ProjectLogin.login()
+            loginpage.login()
         else:
             print("Invalid choice. Please try again.")
             
