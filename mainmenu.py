@@ -1,6 +1,6 @@
 from tinydb import TinyDB, Query
 import datetime
-import ProjectLogin
+import loginpage
 
 
 # Initialize TinyDB dairy entries
