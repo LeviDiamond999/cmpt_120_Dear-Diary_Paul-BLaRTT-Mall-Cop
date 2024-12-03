@@ -1,28 +1,36 @@
 from tinydb import TinyDB, Query
-from datetime import datetime
+import datetime
+import ProjectLogin
 
-# Initialize TinyDB
+
+# Initialize TinyDB dairy entries
 db = TinyDB('diary.json')
 diary_table = db.table('diaries')
 Diary = Query()
+
+today=datetime.date.today()
+
 
 # Functions for diary management
 def add_diary_entry(username):
     """Add a new diary entry."""
     print("\n=== Add Diary Entry ===")
-    time = input("Enter the date and time (YYYY-MM-DD HH:MM): ")
-    place = input("Enter the place: ")
-    duration = input("Enter the duration: ")
-    description = input("Enter the description: ")
-    priority = input("Enter the priority (Low/Medium/High): ")
+    '''
+    time = input("Enter the date (MM-DD-YYYY): ")
+    '''
+    now=datetime.datetime.now()
+    current_time=now.strftime("%H:%M")
+    print(f"Current date and time: {today} {current_time}")
+    title = input("Enter a title: ")
+    entry = input("Journal Entry: ")
+    
     
     diary_table.insert({
         "username": username,
-        "time": time,
-        "place": place,
-        "duration": duration,
-        "description": description,
-        "priority": priority
+        "time": current_time,
+        "title": title,
+       "entry": entry,
+        
     })
     print("Diary entry added successfully!")
 
@@ -35,11 +43,12 @@ def view_diary_entries(username):
         return
     for i, entry in enumerate(entries, start=1):
         print(f"\nEntry {i}:")
+        
         print(f"Time: {entry['time']}")
-        print(f"Place: {entry['place']}")
-        print(f"Duration: {entry['duration']}")
-        print(f"Description: {entry['description']}")
-        print(f"Priority: {entry['priority']}")
+        
+        print(f"Title: {entry['title']}")
+        print(f"Entry: {entry['entry']}")
+        
 
 def edit_diary_entry(username):
     """Edit a diary entry."""
@@ -51,35 +60,32 @@ def edit_diary_entry(username):
         print("No entry found with the given description.")
         return
     print("Leave fields blank to keep current values.")
+    '''
     new_time = input(f"New time (current: {entry['time']}): ") or entry['time']
-    new_place = input(f"New place (current: {entry['place']}): ") or entry['place']
-    new_duration = input(f"New duration (current: {entry['duration']}): ") or entry['duration']
-    new_description = input(f"New description (current: {entry['description']}): ") or entry['description']
-    new_priority = input(f"New priority (current: {entry['priority']}): ") or entry['priority']
+    '''
+    new_titlw = input(f"New title (current: {entry['title']}): ") or entry['title']
     
     diary_table.update({
         "time": new_time,
-        "place": new_place,
-        "duration": new_duration,
-        "description": new_description,
-        "priority": new_priority
-    }, (Diary.username == username) & (Diary.description == description))
+        "title": new_title,
+        
+    }, (Diary.username == username) & (Diary.title == title))
     print("Diary entry updated successfully!")
 
 def delete_diary_entry(username):
     """Delete a diary entry."""
     print("\n=== Delete Diary Entry ===")
     view_diary_entries(username)
-    description = input("\nEnter the description of the entry to delete: ")
-    if diary_table.remove((Diary.username == username) & (Diary.description == description)):
+    title = input("\nEnter the title of the entry to delete: ")
+    if diary_table.remove((Diary.username == username) & (Diary.title == title)):
         print("Diary entry deleted successfully!")
     else:
-        print("No entry found with the given description.")
+        print("No entry found with the given title.")
 
 def search_diary_entries(username):
     """Search diary entries."""
     print("\n=== Search Diary Entries ===")
-    criteria = input("Search by (time/place/duration): ").strip().lower()
+    criteria = input("Search by (time/title): ").strip().lower()
     value = input(f"Enter the {criteria}: ").strip()
     entries = diary_table.search((Diary.username == username) & (Diary[criteria] == value))
     if not entries:
@@ -88,10 +94,7 @@ def search_diary_entries(username):
     for i, entry in enumerate(entries, start=1):
         print(f"\nEntry {i}:")
         print(f"Time: {entry['time']}")
-        print(f"Place: {entry['place']}")
-        print(f"Duration: {entry['duration']}")
-        print(f"Description: {entry['description']}")
-        print(f"Priority: {entry['priority']}")
+        print(f"Title: {entry['title']}")
 
 # Main Menu
 def main_menu(username):
@@ -117,11 +120,10 @@ def main_menu(username):
             search_diary_entries(username)
         elif choice == '6':
             print("Logging out. Goodbye!")
-            break
+            ProjectLogin.login()
         else:
             print("Invalid choice. Please try again.")
-
-# Example Usage
-if __name__ == "__main__":
-    username = "test_user"  # Replace with actual login logic
+            
+def main(username):
+    
     main_menu(username)
