@@ -21,28 +21,6 @@ def add_user():
         users_table.insert({'username': name, 'password': passwrd, 'is_admin': False})
         print(f"Account created with username: {name} and password: {passwrd}")
     
-# Functions for diary management
-def add_diary_entry(username):
-    """Add a new diary entry."""
-    print("\n=== Add Diary Entry ===")
-    '''
-    time = input("Enter the date (MM-DD-YYYY): ")
-    '''
-    now=datetime.datetime.now()
-    current_time=now.strftime("%H:%M")
-    print(f"Current date and time: {today} {current_time}")
-    title = input("Enter a title: ")
-    entry = input("Journal Entry: ")
-    
-    
-    diary_table.insert({
-        "username": username,
-        "time": current_time,
-        "title": title,
-        "entry": entry,
-        
-    })
-    print("Diary entry added successfully!")
 
 def view_diary_entries():
     """View all diary entries for the current user."""
@@ -74,9 +52,8 @@ def delete_diary_entry():
 def search_diary_entries():
     """Search diary entries."""
     print("\n=== Search Diary Entries ===")
-    criteria = input("Search by (time/title): ").strip().lower()
-    value = input(f"Enter the {criteria}: ").strip()
-    entries = diary_table.search(Diary[criteria] == value)
+    title = input("Search by title: ")
+    entries = diary_table.search(Diary.title == title)
     if not entries:
         print("No diary entries found.")
         return
