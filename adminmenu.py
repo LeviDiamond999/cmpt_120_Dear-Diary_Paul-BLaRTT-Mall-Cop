@@ -59,6 +59,7 @@ def search_diary_entries():
         return
     for i, entry in enumerate(entries, start=1):
         print(f"\nEntry {i}:")
+        print(f"User: {entry['username']}")
         print(f"Time: {entry['time']}")
         print(f"Title: {entry['title']}")
 
